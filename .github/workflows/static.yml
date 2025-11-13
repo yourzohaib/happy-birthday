@@ -1,43 +1,346 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy static content to Pages
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Happy Birthday, Evans! 🎉</title>
+  <meta name="description" content="A personalized, animated birthday greeting for Evans — open, enjoy the surprise, and share the joy!" />
+  <style>
+    :root{
+      --bg1:#0f172a; --bg2:#07203c;
+      --card:#0b1220; --accent:#ff7ab6; --accent2:#ffd86b;
+      --glass: rgba(255,255,255,0.04);
+      --radius:18px; --shadow: 0 8px 30px rgba(2,6,23,0.6);
+      --maxw:980px;
+      --sans: system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:var(--sans);
+      color:#e6eef8;
+      background: radial-gradient(800px 400px at 10% 20%, rgba(255,122,182,0.06), transparent 6%),
+                  radial-gradient(600px 300px at 90% 80%, rgba(255,216,107,0.04), transparent 6%),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      -webkit-font-smoothing:antialiased;
+      display:flex; align-items:center; justify-content:center;
+      padding:32px;
+    }
 
-on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+    .card{
+      width:100%;
+      max-width:var(--maxw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:calc(var(--radius) + 6px);
+      padding:28px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,0.04);
+    }
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    header{
+      display:flex; gap:18px; align-items:center;
+    }
+    .avatar{
+      width:96px; height:96px; flex:0 0 96px;
+      border-radius:20px; overflow:hidden;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:28px; color:#081022;
+      box-shadow:0 6px 22px rgba(0,0,0,0.5), inset 0 -6px 18px rgba(255,255,255,0.06);
+    }
+    h1{margin:0; font-size:28px; letter-spacing:-0.02em}
+    p.lead{margin:6px 0 0; opacity:0.9}
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+    .controls{margin-top:18px; display:flex; gap:12px; flex-wrap:wrap}
+    button.btn{
+      border:0; padding:10px 16px; border-radius:12px; cursor:pointer;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      color:#041124; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,0.45);
+      transition:transform .16s ease, box-shadow .16s;
+    }
+    button.btn:active{transform:translateY(1px)}
+    button.ghost{
+      background:transparent; border:1px solid rgba(255,255,255,0.06);
+      color:inherit; font-weight:600; padding:10px 14px;
+    }
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
-concurrency:
-  group: "pages"
-  cancel-in-progress: false
+    .scene{
+      margin-top:22px; display:flex; gap:20px; align-items:center; flex-wrap:wrap;
+    }
 
-jobs:
-  # Single deploy job since we're just deploying
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: '.'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+    .card-art{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:14px; padding:18px; width:360px; flex:0 0 360px;
+      box-shadow:inset 0 -6px 18px rgba(0,0,0,0.2);
+    }
+    .message{
+      flex:1; min-width:220px;
+      background:var(--glass); padding:18px; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.02);
+    }
+
+    .cake{
+      width:100%; height:160px; display:flex; align-items:center; justify-content:center;
+      position:relative;
+    }
+    .balloons{position:absolute; inset:6px; pointer-events:none}
+
+    .footer{
+      margin-top:18px; display:flex; justify-content:space-between; align-items:center; gap:12px;
+      font-size:13px; opacity:0.9;
+    }
+
+    /* surprise modal */
+    .modal{
+      position:fixed; inset:0; display:grid; place-items:center; z-index:60;
+      background:linear-gradient(180deg, rgba(2,6,23,0.72), rgba(2,6,23,0.86));
+      opacity:0; pointer-events:none; transition:opacity .28s;
+    }
+    .modal.open{opacity:1; pointer-events:auto}
+    .modal-card{
+      background:linear-gradient(180deg,#071426 10%, #0c1b2b 100%);
+      padding:26px; border-radius:20px; width:min(720px,92%); box-shadow:0 22px 60px rgba(2,6,23,0.7);
+      text-align:center; border:1px solid rgba(255,255,255,0.04);
+    }
+    .modal h2{margin:0 0 8px}
+    .close-x{margin-top:16px}
+
+    /* small screens */
+    @media (max-width:760px){
+      .card{padding:18px}
+      .avatar{width:76px;height:76px;font-size:22px}
+      .card-art{flex-basis:100%; width:100%}
+      .scene{flex-direction:column}
+      .message{width:100%}
+    }
+
+    /* decorative confetti pieces (will be populated by JS) */
+    .confetti-piece{position:fixed; width:10px; height:16px; z-index:50; pointer-events:none; opacity:0.95;}
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="greeting">
+    <header>
+      <div class="avatar" id="avatar" aria-hidden="true">E</div>
+      <div>
+        <h1 id="greeting">Happy Birthday, <span id="nameText">Evans</span>! 🎉</h1>
+        <p class="lead" id="sub">May your day be bright, loud, and full of cake.</p>
+        <div class="controls" role="group" aria-label="Birthday card actions">
+          <button class="btn" id="surpriseBtn" aria-haspopup="dialog">✨ Click for Your Surprise</button>
+          <button class="ghost" id="toggleMusic" aria-pressed="false">🔈 Music: Off</button>
+          <button class="ghost" id="downloadBtn">⬇️ Download e-card</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="scene" aria-label="Celebration scene">
+      <div class="card-art" aria-hidden="true">
+        <div class="cake" id="cakeArea" title="A tiny cake animation">
+          <!-- simple cake drawn in HTML/CSS -->
+          <svg width="220" height="140" viewBox="0 0 220 140" role="img" aria-label="Birthday cake">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#ffd86b"/><stop offset="1" stop-color="#ff7ab6"/></linearGradient>
+            </defs>
+            <rect x="48" y="60" rx="14" width="124" height="56" fill="#ffdede" stroke="#fff6" stroke-width="1.2"/>
+            <rect x="60" y="40" width="100" height="20" rx="10" fill="url(#g1)"/>
+            <circle cx="110" cy="32" r="7" fill="#fff"/>
+            <g id="candles" fill="#fff">
+              <rect x="86" y="22" width="6" height="18" rx="3" fill="#ff4d6d"></rect>
+              <rect x="102" y="20" width="6" height="20" rx="3" fill="#ffd86b"></rect>
+              <rect x="118" y="22" width="6" height="18" rx="3" fill="#8be6ff"></rect>
+            </g>
+          </svg>
+        </div>
+        <div style="margin-top:8px; font-size:14px; opacity:0.95">Click the surprise to unleash confetti & a message.</div>
+      </div>
+
+      <aside class="message" aria-labelledby="noteTitle">
+        <h3 id="noteTitle">A little note</h3>
+        <p id="noteText">Some people brighten our lives just by being themselves. Here's to another year of adventures, laughs, and everything that makes you, you.</p>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap">
+          <button class="btn" id="wishBtn">Make a wish ✨</button>
+          <button class="ghost" id="shareBtn">Share this</button>
+        </div>
+      </aside>
+    </section>
+
+    <div class="footer">
+      <div>Made with ❤️ — open to customize</div>
+      <div style="opacity:0.9; font-size:13px">Tip: add <code>?name=Friend</code> to the URL to personalize</div>
+    </div>
+  </main>
+
+  <!-- surprise modal -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" aria-hidden="true">
+    <div class="modal-card" id="modalCard">
+      <h2 id="modalTitle">Surprise! 🎊</h2>
+      <p id="modalMsg">Wishing you a day filled with love, laughter, and sweet memories. Happy Birthday, <strong id="modalName">Evans</strong>!</p>
+      <div style="margin-top:18px">
+        <button class="btn" id="closeModal">Close</button>
+        <button class="ghost close-x" id="moreFun">More fun</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- audio (optional) -->
+  <audio id="bgMusic" loop preload="none">
+    <!-- No source provided. To use, add a small hosted mp3 and uncomment below.
+    <source src="happy-birthday-loop.mp3" type="audio/mpeg"> -->
+  </audio>
+
+  <script>
+    /* Utility: read ?name= query */
+    function getNameFromQuery(defaultName){
+      try{
+        const params = new URLSearchParams(location.search);
+        const n = params.get('name');
+        if(!n) return defaultName;
+        const safe = n.replace(/[^a-zA-Z0-9 _-]/g,'').trim();
+        return safe || defaultName;
+      }catch(e){ return defaultName; }
+    }
+
+    // personalization
+    const defaultName = 'Evans';
+    const name = getNameFromQuery(defaultName);
+    document.getElementById('nameText').textContent = name;
+    document.getElementById('avatar').textContent = name[0] ? name[0].toUpperCase() : 'E';
+    document.getElementById('modalName').textContent = name;
+
+    // modal behavior
+    const modal = document.getElementById('modal');
+    const surprise = document.getElementById('surpriseBtn');
+    const closeModal = document.getElementById('closeModal');
+    surprise.addEventListener('click', openSurprise);
+    closeModal.addEventListener('click', closeSurprise);
+    document.getElementById('moreFun').addEventListener('click', ()=> {
+      alert('You found more fun — add GIFs, games, or a mini-quiz!');
+    });
+
+    function openSurprise(){
+      modal.classList.add('open');
+      modal.setAttribute('aria-hidden','false');
+      launchConfetti();
+      playMusicIfAvailable();
+    }
+    function closeSurprise(){
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden','true');
+    }
+
+    // confetti (small, dependency-free)
+    function launchConfetti(){
+      const colors = ['#ff7ab6','#ffd86b','#8be6ff','#7af5a5','#b28bff','#fff'];
+      const num = 90;
+      for(let i=0;i<num;i++){
+        const el = document.createElement('div');
+        el.className = 'confetti-piece';
+        el.style.left = Math.random()*100 + 'vw';
+        el.style.top = '-10vh';
+        el.style.width = (8+Math.random()*12)+'px';
+        el.style.height = (10+Math.random()*18)+'px';
+        el.style.background = colors[Math.floor(Math.random()*colors.length)];
+        el.style.transform = 'rotate('+ (Math.random()*360) +'deg)';
+        el.style.opacity = 0.95;
+        document.body.appendChild(el);
+        // animate
+        const fall = 2000 + Math.random()*2600;
+        el.animate([
+          { transform: `translateY(0) rotate(${Math.random()*360}deg)`, opacity:1 },
+          { transform: `translateY(${80+Math.random()*120}vh) rotate(${Math.random()*960}deg)`, opacity:0.95 }
+        ], { duration: fall, easing: 'cubic-bezier(.2,.8,.2,1)'});
+        // remove later
+        setTimeout(()=> el.remove(), fall+200);
+      }
+    }
+
+    // music toggle (if you add a source in the audio element)
+    const bg = document.getElementById('bgMusic');
+    const toggleMusic = document.getElementById('toggleMusic');
+    toggleMusic.addEventListener('click', ()=>{
+      const on = toggleMusic.getAttribute('aria-pressed') === 'true';
+      if(on){
+        toggleMusic.setAttribute('aria-pressed','false');
+        toggleMusic.textContent = '🔈 Music: Off';
+        try{ bg.pause(); bg.currentTime=0 }catch(e){}
+      } else {
+        toggleMusic.setAttribute('aria-pressed','true');
+        toggleMusic.textContent = '🔊 Music: On';
+        try{ bg.play() }catch(e){
+          alert('No music file provided — to enable music, add a small mp3 file named "happy-birthday-loop.mp3" to the same folder.');
+        }
+      }
+    });
+
+    function playMusicIfAvailable(){
+      // play once on surprise (if user hasn't toggled)
+      if(bg.querySelector('source')){
+        bg.play().catch(()=>{/* auto-play blocked; user can toggle */});
+        toggleMusic.setAttribute('aria-pressed','true');
+        toggleMusic.textContent = '🔊 Music: On';
+      }
+    }
+
+    // share button (web share or copy link)
+    document.getElementById('shareBtn').addEventListener('click', async ()=>{
+      const shareUrl = location.href;
+      const shareText = `Happy Birthday ${name}! Open this: ${shareUrl}`;
+      if(navigator.share){
+        try{ await navigator.share({title:`Happy Birthday ${name}`, text: shareText, url: shareUrl}); return; }catch(e){}
+      }
+      // fallback copy
+      await navigator.clipboard.writeText(shareUrl).catch(()=>{});
+      alert('Link copied to clipboard — send it to make someone smile!');
+    });
+
+    // download e-card: create a lightweight PNG snapshot (uses HTML2Canvas would be heavier). We'll do basic printable HTML export:
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+      const blob = new Blob([document.documentElement.outerHTML], {type:'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = `birthday-${name.replace(/\s+/g,'-').toLowerCase()}.html`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+      alert('A downloadable HTML e-card was created (save and share the file). For PNG/JPEG, use a screenshot tool or integrate html2canvas.');
+    });
+
+    // wish button: playful animation
+    document.getElementById('wishBtn').addEventListener('click', ()=>{
+      const btn = document.getElementById('wishBtn');
+      btn.disabled = true;
+      btn.textContent = '🎂 Wished!';
+      setTimeout(()=>{ btn.disabled=false; btn.textContent='Make a wish ✨'; }, 2200);
+      // small star burst:
+      burstStars();
+    });
+
+    function burstStars(){
+      const n=22;
+      for(let i=0;i<n;i++){
+        const s = document.createElement('div');
+        s.style.position='fixed'; s.style.left = (50+ (Math.random()-0.5)*30) + 'vw';
+        s.style.top = (30 + (Math.random()-0.5)*20) + 'vh';
+        s.style.fontSize = (10+Math.random()*18)+'px';
+        s.style.opacity=1; s.style.pointerEvents='none';
+        s.textContent = '✨';
+        document.body.appendChild(s);
+        s.animate([{transform:'translateY(0) scale(1)', opacity:1},{transform:`translateY(${ -40 - Math.random()*80 }px) scale(.6)`, opacity:0}], {duration:900 + Math.random()*600, easing:'cubic-bezier(.2,.8,.2,1)'});
+        setTimeout(()=>s.remove(), 1600);
+      }
+    }
+
+    // Accessibility: close modal on Escape
+    document.addEventListener('keydown', (e)=>{
+      if(e.key === 'Escape' && modal.classList.contains('open')) closeSurprise();
+    });
+
+    // small progressive enhancement: auto open modal if ?open=true
+    try{
+      const p = new URLSearchParams(location.search);
+      if(p.get('open') === 'true'){ setTimeout(()=>openSurprise(), 700); }
+    }catch(e){}
+  </script>
+</body>
+</html>
